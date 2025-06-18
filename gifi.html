@@ -1132,7 +1132,7 @@
                 // Demo data when not in Telegram
                 headerAvatar.innerHTML = 'AJ';
                 profileAvatar.innerHTML = 'AJ';
-                userName.textContent = 'Алексей Ж.';
+                userName.textContent = {user.first_name};
                 tgAuthBtn.style.display = 'flex';
                 tgAuthBtn.addEventListener('click', () => {
                     alert('Эта функция доступна только в Telegram приложении');
