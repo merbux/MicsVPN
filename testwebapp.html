@@ -3,107 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram User Info</title>
+    <title>Telegram Web App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
+            text-align: center;
         }
-        .user-info {
-            background-color: #f5f5f5;
+        .info {
+            background: #f5f5f5;
             padding: 15px;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin: 10px 0;
+            text-align: left;
         }
         button {
             padding: 10px 15px;
-            background-color: #0088cc;
+            background: #0088cc;
             color: white;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
             margin: 5px;
+            cursor: pointer;
         }
-        button:hover {
-            background-color: #0077bb;
-        }
-        #json-output {
-            background-color: #f0f0f0;
+        #jsonData {
+            display: none;
+            background: #f0f0f0;
             padding: 15px;
             border-radius: 10px;
             margin-top: 20px;
+            text-align: left;
             white-space: pre-wrap;
-            word-wrap: break-word;
-            display: none;
         }
     </style>
 </head>
 <body>
-    <h1>Информация о пользователе</h1>
+    <h1>Мой Telegram Web App</h1>
     
-    <div class="user-info">
-        <h2>Основная информация</h2>
-        <p><strong>Имя:</strong> <span id="first-name"></span></p>
-        <p><strong>Фамилия:</strong> <span id="last-name"></span></p>
-        <p><strong>Username:</strong> <span id="username"></span></p>
-        <p><strong>Язык:</strong> <span id="language"></span></p>
-        <p><strong>ID:</strong> <span id="user-id"></span></p>
-        <p><strong>Платформа:</strong> <span id="platform"></span></p>
+    <div class="info">
+        <p><strong>Имя:</strong> <span id="firstName">-</span></p>
+        <p><strong>Username:</strong> <span id="username">-</span></p>
+        <p><strong>ID:</strong> <span id="userId">-</span></p>
     </div>
     
-    <button onclick="showFullData()">Показать полные данные (JSON)</button>
-    <button onclick="closeApp()">Закрыть приложение</button>
+    <button onclick="showAlert()">Тест Alert</button>
+    <button onclick="toggleJson()">Показать JSON</button>
+    <button onclick="closeWebApp()">Закрыть</button>
     
-    <div id="json-output"></div>
+    <div id="jsonData"></div>
 
     <script>
-        const tg = window.Telegram.WebApp;
+        // Инициализация WebApp
+        const tg = Telegram.WebApp;
         
-        // Показываем кнопку "Назад"
-        tg.BackButton.show();
-        tg.BackButton.onClick(() => {
-            tg.close();
-        });
-        
-        // Заполняем основную информацию о пользователе
-        function displayUserInfo() {
+        // Показываем основную информацию
+        function init() {
             const user = tg.initDataUnsafe.user || {};
             
-            document.getElementById('first-name').textContent = user.first_name || 'Не указано';
-            document.getElementById('last-name').textContent = user.last_name || 'Не указано';
-            document.getElementById('username').textContent = user.username ? '@' + user.username : 'Не указано';
-            document.getElementById('language').textContent = tg.initDataUnsafe.user?.language_code || 'Не определен';
-            document.getElementById('user-id').textContent = user.id || 'Не доступен';
-            document.getElementById('platform').textContent = tg.platform || 'Не определено';
-        }
-        
-        // Показать полные данные в JSON
-        function showFullData() {
-            const output = document.getElementById('json-output');
-            output.style.display = 'block';
-            output.innerHTML = JSON.stringify(tg.initDataUnsafe, null, 2);
+            document.getElementById('firstName').textContent = user.first_name || 'Неизвестно';
+            document.getElementById('username').textContent = user.username ? '@' + user.username : 'Нет username';
+            document.getElementById('userId').textContent = user.id || 'Недоступно';
             
-            // Прокручиваем к выводу
-            output.scrollIntoView({ behavior: 'smooth' });
+            // Настройка кнопки "Назад"
+            tg.BackButton.show();
+            tg.BackButton.onClick(() => {
+                tg.close();
+            });
+            
+            // Настройка MainButton
+            tg.MainButton.setText("Готово");
+            tg.MainButton.show();
+            tg.MainButton.onClick(() => {
+                tg.showAlert("Основная кнопка нажата!");
+            });
         }
         
-        // Закрыть приложение
-        function closeApp() {
+        // Показать alert
+        function showAlert() {
+            tg.showAlert("Это тестовое сообщение от Web App!");
+        }
+        
+        // Показать/скрыть JSON данные
+        function toggleJson() {
+            const jsonDiv = document.getElementById('jsonData');
+            if (jsonDiv.style.display === 'block') {
+                jsonDiv.style.display = 'none';
+            } else {
+                jsonDiv.style.display = 'block';
+                jsonDiv.textContent = JSON.stringify({
+                    initData: tg.initDataUnsafe,
+                    webAppInfo: {
+                        platform: tg.platform,
+                        colorScheme: tg.colorScheme,
+                        viewportHeight: tg.viewportHeight,
+                        viewportStableHeight: tg.viewportStableHeight
+                    }
+                }, null, 2);
+            }
+        }
+        
+        // Закрыть WebApp
+        function closeWebApp() {
             tg.close();
         }
         
         // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', displayUserInfo);
-        
-        // Настройка MainButton
-        tg.MainButton.setText("Готово");
-        tg.MainButton.show();
-        tg.MainButton.onClick(() => {
-            tg.showAlert("Спасибо за использование нашего приложения!");
-        });
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
