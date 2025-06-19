@@ -1,173 +1,60 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Web App (Dark)</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --bg-color: #212121;
-            --text-color: #ffffff;
-            --card-bg: #424242;
-            --button-bg: #1976d2;
-            --button-hover: #1565c0;
-            --json-bg: #333333;
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            text-align: center;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-        }
-        
-        .info {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            text-align: left;
-        }
-        
-        button {
-            padding: 10px 15px;
-            background: var(--button-bg);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            margin: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        button:hover {
-            background: var(--button-hover);
-        }
-        
-        #jsonData {
-            display: none;
-            background: var(--json-bg);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            text-align: left;
-            white-space: pre-wrap;
-            color: #e0e0e0;
-        }
-        
-        h1 {
-            color: #bb86fc;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Telegram Web App Example</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f2f2f2;
+    }
+    #output {
+      margin-top: 20px;
+      padding: 10px;
+      background: white;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #2ea7e0;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Мой Telegram Web App</h1>
-    
-    <div class="info">
-        <p><strong>Имя:</strong> <span id="firstName">-</span></p>
-        <p><strong>Username:</strong> <span id="username">-</span></p>
-        <p><strong>ID:</strong> <span id="userId">-</span></p>
-        <p><strong>Тема:</strong> <span id="colorScheme">-</span></p>
-    </div>
-    
-    <button onclick="showAlert()">Тест Alert</button>
-    <button onclick="toggleJson()">Показать JSON</button>
-    <button onclick="closeWebApp()">Закрыть</button>
-    
-    <div id="jsonData"></div>
+  <h2>Пример Telegram WebApp</h2>
+  <button onclick="showUserInfo()">Показать информацию о пользователе</button>
 
-    <script>
-        // Инициализация WebApp
-        const tg = window.Telegram?.WebApp || {
-            initDataUnsafe: {},
-            platform: 'browser',
-            colorScheme: 'dark',
-            BackButton: {
-                show: () => {},
-                hide: () => {},
-                onClick: () => {},
-                offClick: () => {}
-            },
-            MainButton: {
-                setText: () => {},
-                show: () => {},
-                hide: () => {},
-                onClick: () => {},
-                offClick: () => {}
-            },
-            showAlert: (msg) => alert(msg),
-            close: () => console.log('WebApp closed')
-        };
+  <div id="output"></div>
 
-        // Установка темы
-        function applyColorScheme() {
-            const scheme = tg.colorScheme || 'dark';
-            document.documentElement.style.setProperty('--bg-color', scheme === 'dark' ? '#212121' : '#ffffff');
-            document.documentElement.style.setProperty('--text-color', scheme === 'dark' ? '#ffffff' : '#000000');
-            document.documentElement.style.setProperty('--card-bg', scheme === 'dark' ? '#424242' : '#f5f5f5');
-            document.documentElement.style.setProperty('--json-bg', scheme === 'dark' ? '#333333' : '#f0f0f0');
-            document.getElementById('colorScheme').textContent = scheme === 'dark' ? 'Тёмная' : 'Светлая';
-        }
+  <script>
+    const tg = window.Telegram.WebApp;
 
-        // Показываем основную информацию
-        function init() {
-            const user = tg.initDataUnsafe.user || {};
-            
-            document.getElementById('firstName').textContent = user.first_name || 'Неизвестно';
-            document.getElementById('username').textContent = user.username ? '@' + user.username : 'Нет username';
-            document.getElementById('userId').textContent = user.id || 'Недоступно';
-            
-            // Настройка темы
-            applyColorScheme();
-            
-            // Настройка кнопки "Назад"
-            tg.BackButton.show();
-            tg.BackButton.onClick(() => {
-                tg.close();
-            });
-            
-            // Настройка MainButton
-            tg.MainButton.setText("Готово");
-            tg.MainButton.show();
-            tg.MainButton.onClick(() => {
-                tg.showAlert("Основная кнопка нажата!");
-            });
-        }
-        
-        // Показать alert
-        function showAlert() {
-            tg.showAlert("Это тестовое сообщение от Web App!");
-        }
-        
-        // Показать/скрыть JSON данные
-        function toggleJson() {
-            const jsonDiv = document.getElementById('jsonData');
-            if (jsonDiv.style.display === 'block') {
-                jsonDiv.style.display = 'none';
-            } else {
-                jsonDiv.style.display = 'block';
-                jsonDiv.textContent = JSON.stringify({
-                    initData: tg.initDataUnsafe,
-                    webAppInfo: {
-                        platform: tg.platform,
-                        colorScheme: tg.colorScheme,
-                        viewportHeight: tg.viewportHeight,
-                        viewportStableHeight: tg.viewportStableHeight
-                    }
-                }, null, 2);
-            }
-        }
-        
-        // Закрыть WebApp
-        function closeWebApp() {
-            tg.close();
-        }
-        
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+    tg.ready();  // сообщает Telegram, что WebApp готов
+
+    // можно настроить цвет и кнопки
+    tg.expand();
+    tg.MainButton.text = "Готово";
+    tg.MainButton.show();
+
+    function showUserInfo() {
+      const user = tg.initDataUnsafe?.user;
+      if (user) {
+        document.getElementById('output').innerHTML = `
+          <strong>Имя:</strong> ${user.first_name}<br>
+          <strong>Фамилия:</strong> ${user.last_name || "нет"}<br>
+          <strong>Юзернейм:</strong> @${user.username || "нет"}<br>
+          <strong>ID:</strong> ${user.id}
+        `;
+      } else {
+        document.getElementById('output').innerText = "Информация о пользователе недоступна.";
+      }
+    }
+  </script>
 </body>
 </html>
