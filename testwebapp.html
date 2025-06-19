@@ -2,130 +2,108 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Telegram WebApp Check</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram User Info</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
+            padding: 20px;
             max-width: 600px;
             margin: 0 auto;
-            padding: 20px;
-            text-align: center;
         }
-        
-        .container {
-            margin-top: 50px;
-        }
-        
-        .success {
-            color: green;
-            font-size: 24px;
+        .user-info {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 10px;
             margin-bottom: 20px;
         }
-        
-        .error {
-            color: red;
-            font-size: 24px;
-            margin-bottom: 20px;
+        button {
+            padding: 10px 15px;
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
         }
-        
-        .user-data {
-            background: #f5f5f5;
+        button:hover {
+            background-color: #0077bb;
+        }
+        #json-output {
+            background-color: #f0f0f0;
             padding: 15px;
             border-radius: 10px;
             margin-top: 20px;
-            text-align: left;
-        }
-        
-        .telegram-btn {
-            background: #0088cc;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-        
-        .hidden {
+            white-space: pre-wrap;
+            word-wrap: break-word;
             display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div id="webAppSuccess" class="hidden">
-            <div class="success">✓ Вы используете Telegram WebApp</div>
-            <div>Добро пожаловать!</div>
-            
-            <div id="userInfo" class="user-data hidden">
-                <h3>Ваши данные:</h3>
-                <p><strong>Имя:</strong> <span id="userName"></span></p>
-                <p><strong>Username:</strong> @<span id="userUsername"></span></p>
-                <p><strong>ID:</strong> <span id="userId"></span></p>
-            </div>
-        </div>
-        
-        <div id="webAppError" class="hidden">
-            <div class="error">✗ Это не Telegram WebApp</div>
-            <p>Для работы с этим приложением необходимо открыть его через Telegram.</p>
-            <p>Пожалуйста, перейдите по ссылке в Telegram или отсканируйте QR-код:</p>
-            
-            <div style="margin: 20px 0;">
-                <!-- Замените ссылку на вашу -->
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://t.me/your_bot_name?start=app" 
-                     alt="QR код для Telegram" width="200">
-            </div>
-            
-            <a href="https://t.me/your_bot_name?start=app" class="telegram-btn">
-                Открыть в Telegram
-            </a>
-        </div>
+    <h1>Информация о пользователе</h1>
+    
+    <div class="user-info">
+        <h2>Основная информация</h2>
+        <p><strong>Имя:</strong> <span id="first-name"></span></p>
+        <p><strong>Фамилия:</strong> <span id="last-name"></span></p>
+        <p><strong>Username:</strong> <span id="username"></span></p>
+        <p><strong>Язык:</strong> <span id="language"></span></p>
+        <p><strong>ID:</strong> <span id="user-id"></span></p>
+        <p><strong>Платформа:</strong> <span id="platform"></span></p>
     </div>
+    
+    <button onclick="showFullData()">Показать полные данные (JSON)</button>
+    <button onclick="closeApp()">Закрыть приложение</button>
+    
+    <div id="json-output"></div>
 
     <script>
-        // Проверяем, загружен ли Telegram WebApp SDK
-        function checkTelegramWebApp() {
-            const webAppSuccess = document.getElementById('webAppSuccess');
-            const webAppError = document.getElementById('webAppError');
+        const tg = window.Telegram.WebApp;
+        
+        // Показываем кнопку "Назад"
+        tg.BackButton.show();
+        tg.BackButton.onClick(() => {
+            tg.close();
+        });
+        
+        // Заполняем основную информацию о пользователе
+        function displayUserInfo() {
+            const user = tg.initDataUnsafe.user || {};
             
-            if (window.Telegram && Telegram.WebApp) {
-                // Это Telegram WebApp
-                webAppSuccess.classList.remove('hidden');
-                webAppError.classList.add('hidden');
-                
-                // Пытаемся получить данные пользователя
-                const user = Telegram.WebApp.initDataUnsafe?.user;
-                const userInfo = document.getElementById('userInfo');
-                
-                if (user) {
-                    userInfo.classList.remove('hidden');
-                    document.getElementById('userName').textContent = 
-                        [user.first_name, user.last_name].filter(Boolean).join(' ');
-                    document.getElementById('userUsername').textContent = user.username || 'не указан';
-                    document.getElementById('userId').textContent = user.id;
-                }
-                
-                // Инициализируем WebApp
-                Telegram.WebApp.ready();
-                
-                // Можно расширить функционал:
-                // Telegram.WebApp.expand(); // Развернуть на весь экран
-                // Telegram.WebApp.enableClosingConfirmation(); // Запросить подтверждение при закрытии
-            } else {
-                // Это не Telegram WebApp
-                webAppSuccess.classList.add('hidden');
-                webAppError.classList.remove('hidden');
-            }
+            document.getElementById('first-name').textContent = user.first_name || 'Не указано';
+            document.getElementById('last-name').textContent = user.last_name || 'Не указано';
+            document.getElementById('username').textContent = user.username ? '@' + user.username : 'Не указано';
+            document.getElementById('language').textContent = tg.initDataUnsafe.user?.language_code || 'Не определен';
+            document.getElementById('user-id').textContent = user.id || 'Не доступен';
+            document.getElementById('platform').textContent = tg.platform || 'Не определено';
         }
         
-        // Проверяем при загрузке страницы
-        document.addEventListener('DOMContentLoaded', checkTelegramWebApp);
+        // Показать полные данные в JSON
+        function showFullData() {
+            const output = document.getElementById('json-output');
+            output.style.display = 'block';
+            output.innerHTML = JSON.stringify(tg.initDataUnsafe, null, 2);
+            
+            // Прокручиваем к выводу
+            output.scrollIntoView({ behavior: 'smooth' });
+        }
         
-        // Дополнительно: запрещаем масштабирование и выделение текста
-        document.addEventListener('contextmenu', e => e.preventDefault());
+        // Закрыть приложение
+        function closeApp() {
+            tg.close();
+        }
+        
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', displayUserInfo);
+        
+        // Настройка MainButton
+        tg.MainButton.setText("Готово");
+        tg.MainButton.show();
+        tg.MainButton.onClick(() => {
+            tg.showAlert("Спасибо за использование нашего приложения!");
+        });
     </script>
 </body>
 </html>
