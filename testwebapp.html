@@ -2,58 +2,47 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Telegram Web App Example</title>
+  <title>Telegram WebApp Demo</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: sans-serif;
       padding: 20px;
-      background: #f2f2f2;
-    }
-    #output {
-      margin-top: 20px;
-      padding: 10px;
-      background: white;
-      border-radius: 5px;
     }
     button {
       padding: 10px 20px;
       font-size: 16px;
-      background-color: #2ea7e0;
-      color: white;
-      border: none;
-      border-radius: 5px;
+    }
+    #output {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: #f5f5f5;
+      padding: 10px;
     }
   </style>
 </head>
 <body>
-  <h2>Пример Telegram WebApp</h2>
-  <button onclick="showUserInfo()">Показать информацию о пользователе</button>
-
-  <div id="output"></div>
+  <h2>Telegram WebApp Example</h2>
+  <button onclick="showUserInfo()">Показать информацию</button>
+  <div id="output">Нажми кнопку</div>
 
   <script>
     const tg = window.Telegram.WebApp;
-
-    tg.ready();  // сообщает Telegram, что WebApp готов
-
-    // можно настроить цвет и кнопки
-    tg.expand();
-    tg.MainButton.text = "Готово";
-    tg.MainButton.show();
+    tg.ready();
 
     function showUserInfo() {
-      const user = tg.initDataUnsafe?.user;
-      if (user) {
-        document.getElementById('output').innerHTML = `
-          <strong>Имя:</strong> ${user.first_name}<br>
-          <strong>Фамилия:</strong> ${user.last_name || "нет"}<br>
-          <strong>Юзернейм:</strong> @${user.username || "нет"}<br>
-          <strong>ID:</strong> ${user.id}
-        `;
-      } else {
-        document.getElementById('output').innerText = "Информация о пользователе недоступна.";
+      if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
+        document.getElementById('output').innerText = '❌ Не запущено из Telegram Web App или нет доступа к данным.';
+        return;
       }
+
+      const user = tg.initDataUnsafe.user;
+      const info = `
+👤 Имя: ${user.first_name}
+🆔 ID: ${user.id}
+📛 Юзернейм: @${user.username || "нет"}
+      `;
+      document.getElementById('output').innerText = info;
     }
   </script>
 </body>
